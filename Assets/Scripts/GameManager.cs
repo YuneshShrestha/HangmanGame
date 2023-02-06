@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +11,9 @@ public class GameManager : MonoBehaviour
     public GameObject[] hangmanBodyParts;
     public GameObject winText;
     public GameObject loseText;
+    public GameObject resetButton;
     private float time;
-    private string[] textList = { "CAT", "BOAT" ,"HORSE" ,"BUFFALO", "YO YO"};
+    private string[] textList;
     private string textToDisplay;
     private string hiddenText;
     private bool gameEnd;
@@ -21,7 +23,10 @@ public class GameManager : MonoBehaviour
     {
         gameEnd = false;
         mistakes = 0;
+        //Reading from each line from file
+        textList = File.ReadAllLines(@"Assets/TextFolder/WordsFile.txt");
         textToDisplay = textList[Random.Range(0,textList.Length)];
+
         hiddenText="";
         for (int i = 0; i < textToDisplay.Length; i++) {
             if (char.IsWhiteSpace(textToDisplay[i]))
@@ -34,7 +39,7 @@ public class GameManager : MonoBehaviour
 
         }
         wordToFind.text = hiddenText;
-        Debug.Log(textToDisplay.Length);
+        Debug.Log(textToDisplay);
     }
 
     // Update is called once per frame
@@ -58,6 +63,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log(i);
                 while (i != -1)
                 {
+                    // 2* because we are counting spacesto display
                     hiddenText = hiddenText.Substring(0, 2 * i) + pressedLetter + " " + hiddenText.Substring(2 * (i + 1));
                     textToDisplay = textToDisplay.Substring(0, i) + "_" + textToDisplay.Substring(i + 1);
                     i = textToDisplay.IndexOf(pressedLetter);
@@ -71,10 +77,13 @@ public class GameManager : MonoBehaviour
             if (mistakes == hangmanBodyParts.Length) {
                 loseText.SetActive(true);
                 gameEnd = true;
+                resetButton.SetActive(true);
             }
             if (!hiddenText.Contains("_")) {
                 winText.SetActive(true);
                 gameEnd = true;
+                resetButton.SetActive(true);
+
             }
         }
     }
